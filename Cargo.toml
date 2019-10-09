@@ -1,0 +1,11 @@
+[package]
+name = "test_dir"
+version = "0.1.0"
+authors = ["Rafał Pachołek <rafalpacholek@gmail.com>"]
+edition = "2018"
+license = "MIT"
+description = "Easy creation of temporary file structure for test purpose."
+readme = "README.md"
+
+[dependencies]
+rand = "0.7"
