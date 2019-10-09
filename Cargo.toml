@@ -6,6 +6,9 @@ edition = "2018"
 license = "MIT"
 description = "Easy creation of temporary file structure for test purpose."
 readme = "README.md"
+repository = "https://github.com/rpacholek/test_dir"
+keywords = [ "test", "dir", "file", "directory", "temp" ]
+categories = [ "development-tools::testing" ]
 
 [dependencies]
 rand = "0.7"

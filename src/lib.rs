@@ -25,6 +25,7 @@ use std::io::BufWriter;
 use std::iter;
 use std::path::{Path, PathBuf};
 
+/// Supported file types with TestDir
 #[derive(PartialEq, Debug)]
 pub enum FileType {
     /// Create empty file
@@ -38,6 +39,7 @@ pub enum FileType {
     Dir,
 }
 
+/// Temporary directory
 pub struct TempDir {
     path: PathBuf,
     delete: PathBuf,
@@ -102,6 +104,7 @@ impl Drop for TempDir {
     }
 }
 
+/// Test directory creator 
 pub struct TestDir {
     // Directory lifetime
     _tempdir: Option<TempDir>,
@@ -112,6 +115,7 @@ pub struct TestDir {
     dirs: Vec<PathBuf>,
 }
 
+/// File structure builder trait
 pub trait DirBuilder {
     /// Create a file or directory under the `path`
     fn create(self, path: &str, filetype: FileType) -> Self;
