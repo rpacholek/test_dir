@@ -22,7 +22,6 @@ use rand::{thread_rng, Rng};
 use std::fs;
 use std::io::prelude::*;
 use std::io::BufWriter;
-use std::iter;
 use std::path::{Path, PathBuf};
 
 /// Supported file types with TestDir
@@ -89,9 +88,10 @@ impl TempDir {
     }
 
     fn random_name() -> String {
-        let mut rng = thread_rng();
-        iter::repeat(())
-            .map(|()| rng.sample(Alphanumeric))
+        // https://stackoverflow.com/a/65478580/113632
+        thread_rng()
+            .sample_iter(&Alphanumeric)
+            .map(char::from)
             .take(8)
             .collect()
     }
