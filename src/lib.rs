@@ -47,21 +47,21 @@ pub struct TempDir {
 impl TempDir {
     /// Try to create a temporary directory inside system tmp directory.
     pub fn temp() -> std::io::Result<Self> {
-        let mut temp = std::env::temp_dir().to_path_buf();
+        let mut temp = std::env::temp_dir();
         temp.push(TempDir::random_name());
         TempDir::create(temp.as_path())
     }
 
     /// Try to create a temporary directory inside the current directory.
     pub fn current_rnd() -> std::io::Result<Self> {
-        let mut temp = std::env::current_dir()?.to_path_buf();
+        let mut temp = std::env::current_dir()?;
         temp.push(TempDir::random_name());
         TempDir::create(temp.as_path())
     }
 
     /// Try to create a temporary directory with a given path inside the current directory.
     pub fn current(path: &Path) -> std::io::Result<Self> {
-        let mut temp = std::env::current_dir()?.to_path_buf();
+        let mut temp = std::env::current_dir()?;
         temp.push(path);
         TempDir::create(temp.as_path())
     }
@@ -157,12 +157,12 @@ impl TestDir {
     }
 
     /// Returns all files created with DirBuilder
-    pub fn get_files<'a>(&self) -> &Vec<PathBuf> {
+    pub fn get_files(&self) -> &Vec<PathBuf> {
         &self.files
     }
     
     /// Returns all directories created with DirBuilder
-    pub fn get_dirs<'a>(&self) -> &Vec<PathBuf> {
+    pub fn get_dirs(&self) -> &Vec<PathBuf> {
         &self.dirs
     }
 
@@ -175,7 +175,7 @@ impl TestDir {
 
     // Helper functions
     fn new(tempdir: TempDir) -> Self {
-        let root = tempdir.path().to_path_buf();
+        let root = tempdir.path();
         Self {
             _tempdir: Some(tempdir),
             root,
@@ -187,11 +187,9 @@ impl TestDir {
     fn create_dir(&mut self, path: &Path) -> std::io::Result<()> {
         let mut build_path = self.root.clone();
         build_path.push(path);
-        let result = fs::create_dir_all(build_path.as_path());
-        if let Ok(_) = result {
+        fs::create_dir_all(build_path.as_path())?;
             self.dirs.push(build_path);
-        }
-        result
+        Ok(())
     }
 
     fn create_file(&mut self, path: &Path, filetype: FileType) -> std::io::Result<()> {
