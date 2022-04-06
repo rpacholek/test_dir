@@ -8,7 +8,7 @@ Add the following dependency to Cargo manifest:
 
 ```toml
 [dependencies]
-test_dir = "0.1.0"
+test_dir = "0.2.0"
 ```
 
 ## Example
