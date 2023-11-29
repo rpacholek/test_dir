@@ -41,7 +41,7 @@ pub enum FileType {
 /// Temporary directory
 pub struct TempDir {
     path: PathBuf,
-    delete: PathBuf,
+    delete: Option<PathBuf>,
 }
 
 impl TempDir {
@@ -71,6 +71,13 @@ impl TempDir {
         self.path.clone()
     }
 
+    /// Leak the directory. It will not be deleted on drop.
+    ///
+    /// This is usefull for debugging tests
+    pub fn leak(&mut self) -> Option<PathBuf> {
+        self.delete.take()
+    }
+
     // Helper functions
     fn create(path: &Path) -> std::io::Result<Self> {
         let mut p = path;
@@ -83,7 +90,7 @@ impl TempDir {
         fs::create_dir_all(&path)?;
         Ok(TempDir {
             path: path.to_path_buf(),
-            delete: p.to_path_buf(),
+            delete: Some(p.to_path_buf()),
         })
     }
 
@@ -100,14 +107,16 @@ impl TempDir {
 impl Drop for TempDir {
     /// Delete the created directory tree.
     fn drop(&mut self) {
-        let _ = fs::remove_dir_all(self.delete.as_path());
+        if let Some(delete) = self.delete.as_ref() {
+            let _ = fs::remove_dir_all(delete);
+        }
     }
 }
 
-/// Test directory creator 
+/// Test directory creator
 pub struct TestDir {
     // Directory lifetime
-    _tempdir: Option<TempDir>,
+    tempdir: TempDir,
 
     root: PathBuf,
 
@@ -160,12 +169,11 @@ impl TestDir {
     pub fn get_files<'a>(&self) -> &Vec<PathBuf> {
         &self.files
     }
-    
+
     /// Returns all directories created with DirBuilder
     pub fn get_dirs<'a>(&self) -> &Vec<PathBuf> {
         &self.dirs
     }
-
 
     /*
     fn load(&mut self, path: &Path) {
@@ -173,11 +181,18 @@ impl TestDir {
     }
     */
 
+    /// Leak the test directory. It will not be deleted on drop.
+    ///
+    /// This is usefull for debugging tests
+    pub fn leak(&mut self) -> Option<PathBuf> {
+        self.tempdir.leak()
+    }
+
     // Helper functions
     fn new(tempdir: TempDir) -> Self {
         let root = tempdir.path().to_path_buf();
         Self {
-            _tempdir: Some(tempdir),
+            tempdir,
             root,
             files: vec![],
             dirs: vec![],
